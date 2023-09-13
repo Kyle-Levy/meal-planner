@@ -1,12 +1,13 @@
-export type MealTileData =
-    | {
-          type: TileType.EMPTY
-      }
-    | {
-          type: TileType.FILLED
-          title: string
-          color: TileColor
-      }
+export type MealTileData = EmptyMealTile | FilledMealTile
+
+export type EmptyMealTile = {
+    type: TileType.EMPTY
+}
+export type FilledMealTile = {
+    type: TileType.FILLED
+    title: string
+    color: TileColor
+}
 
 export enum TileType {
     EMPTY = 'EMPTY',

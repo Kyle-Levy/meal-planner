@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import SidebarTile from './sidebar-tile'
 import { TileColor } from './tile'
+import { useForm } from 'react-hook-form'
+import { useMealSchedule } from './context/MealSchedule'
 
 enum SidebarState {
     MEALS = 'MEALS',
@@ -25,22 +27,17 @@ type SidebarContent = {
 }
 
 function MealsContent({ setSidebarView }: SidebarContent) {
+    const mealScheduler = useMealSchedule()
+
     return (
         <>
             <div className="flex items-center justify-center text-lg text-red-900">
                 Meals
             </div>
             <div className="mx-8 border-t border-solid border-gray-300" />
-            <SidebarTile
-                title="Chicken Teriyaki"
-                servingsLeft={4}
-                color={TileColor.EMERALD}
-            />
-            <SidebarTile
-                title="Chicken Teriyaki"
-                servingsLeft={0}
-                color={TileColor.EMERALD}
-            />
+            {mealScheduler.mealsToSchedule.map((mealToSchedule) => {
+                return <SidebarTile {...mealToSchedule} />
+            })}
             <button
                 className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
                 onClick={() => {
@@ -53,12 +50,23 @@ function MealsContent({ setSidebarView }: SidebarContent) {
     )
 }
 
+type CreateMealFormProps = {
+    title: string
+    servingsLeft: number
+}
+
 function CreateMealContent({ setSidebarView }: SidebarContent) {
+    const { handleSubmit, register } = useForm<CreateMealFormProps>()
+    const mealScheduler = useMealSchedule()
+
     return (
         <>
             <div className="flex flex-col gap-2">
                 <label className="text-lg text-red-900">Meal</label>
-                <input className="rounded-md border border-solid border-gray-300 p-2 text-red-900 outline-none" />
+                <input
+                    className="rounded-md border border-solid border-gray-300 p-2 text-red-900 outline-none"
+                    {...register('title', {required: true})}
+                />
             </div>
 
             <div className="flex flex-col gap-2">
@@ -66,14 +74,18 @@ function CreateMealContent({ setSidebarView }: SidebarContent) {
                 <input
                     className="w-16 rounded-md border border-solid border-gray-300 p-2 text-red-900 outline-none"
                     type="number"
+                    {...register('servingsLeft', {required: true})}
                 />
             </div>
 
             <button
                 className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
-                onClick={() => {
+                onClick={handleSubmit((data) => {
+                    console.log(mealScheduler.mealsToSchedule)
+                    mealScheduler.createMeal(data.title, data.servingsLeft)
+                    console.log(mealScheduler.mealsToSchedule)
                     setSidebarView(SidebarState.MEALS)
-                }}
+                })}
             >
                 Create Meal
             </button>

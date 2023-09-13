@@ -1,16 +1,19 @@
 import { ReactNode, createContext, useCallback, useContext } from 'react'
-import { MealTileData, TileColor, TileType } from '../tile'
+import { FilledMealTile, MealTileData, TileColor, TileType } from '../tile'
 import { useImmer } from 'use-immer'
 
 type MealScheduleProviderProps = {
     children: ReactNode
 }
 
-type MealScheduleContext = {
-    scheduledMeals: MealDay[]
-    mealsToSchedule: MealToSchedule[]
-    addEmptyRow: () => void
-} | {}
+type MealScheduleContext =
+    | {
+          scheduledMeals: MealDay[]
+          mealsToSchedule: MealToSchedule[]
+          addEmptyRow: () => void
+          createMeal: (title: string, servingsLeft: number) => void
+      }
+    | {}
 export enum Day {
     Sunday = 'Sunday',
     Monday = 'Monday',
@@ -96,22 +99,37 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
     const addEmptyRow = useCallback(() => {
         setScheduledMeals((oldScheduleState) => {
             oldScheduleState.forEach((mealDay) => {
-                Array.from(mealDay.mealColumnMap.keys()).forEach((mealTimeKey) => {
-                    const setOfMeals = mealDay.mealColumnMap.get(
-                        mealTimeKey as MealTime
-                    )
-                    setOfMeals?.push({ type: TileType.EMPTY })
-                })
+                Array.from(mealDay.mealColumnMap.keys()).forEach(
+                    (mealTimeKey) => {
+                        const setOfMeals =
+                            mealDay.mealColumnMap.get(mealTimeKey)
+                        setOfMeals?.push({ type: TileType.EMPTY })
+                    }
+                )
             })
         })
     }, [])
 
-    function addMealToDay(
+    //TODO Consider adding a UUID to meals to schedule to make keeping track of items easier 
+    const createMeal = useCallback((title: string, servingsLeft: number) => {
+        setMealsToSchedule((oldMealsToSchedule) => {
+            oldMealsToSchedule.push({
+                title,
+                servingsLeft,
+                color: colors[getRandomInt(colors.length)],
+            })
+        })
+    }, [])
+
+    const addMealToDay = useCallback((
         day: Day,
         mealTime: MealTime,
         mealIndex: number,
         mealData: { title: string; color: TileColor }
-    ) {}
+    ) => {
+//TODO Implement
+
+    }, []) 
 
     function removeMealFromDay() {}
 
@@ -119,6 +137,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         scheduledMeals,
         mealsToSchedule,
         addEmptyRow,
+        createMeal
     }
 
     return (
@@ -130,7 +149,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
 
 export function useMealSchedule() {
     const context = useContext(MealScheduleContext)
-    if(!('scheduledMeals' in context)){
+    if (!('scheduledMeals' in context)) {
         throw new Error('Context lacks state and functions')
     }
     return context
