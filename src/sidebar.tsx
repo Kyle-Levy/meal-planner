@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import SidebarTile from './sidebar-tile'
+import DraggableSidebarTile from './draggable-sidebar-tile'
 import { TileColor } from './tile'
 import { useForm } from 'react-hook-form'
 import { useMealSchedule } from './context/MealSchedule'
@@ -36,7 +36,7 @@ function MealsContent({ setSidebarView }: SidebarContent) {
             </div>
             <div className="mx-8 border-t border-solid border-gray-300" />
             {mealScheduler.unscheduledMeals.map((mealToSchedule) => {
-                return <SidebarTile {...mealToSchedule} key={mealToSchedule.id} />
+                return <DraggableSidebarTile {...mealToSchedule} key={mealToSchedule.id} />
             })}
             <button
                 className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"

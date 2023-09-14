@@ -8,6 +8,7 @@ import {
 } from '../tile'
 import { useImmer } from 'use-immer'
 import { v4 as uuid } from 'uuid'
+import { Draft } from 'immer'
 
 type MealScheduleProviderProps = {
     children: ReactNode
@@ -23,8 +24,14 @@ type MealScheduleContext =
               day: Day,
               mealTime: MealTime,
               mealIndex: number,
-              mealData: { id: string; title: string; color: TileColor },
+              mealData: { id: string; title: string; color: TileColor }
           ) => void
+          removeMealFromDay: (
+            day: Day,
+            mealTime: MealTime,
+            mealIndex: number,
+        ) => void
+        canDrag: (id: string) => boolean
       }
     | {}
 export enum Day {
@@ -48,7 +55,7 @@ type ScheduledDay = {
     mealSlotMap: Map<MealTime, IndividualMeal[]>
 }
 
-type UnscheduledMeal = {
+export type UnscheduledMeal = {
     id: string
     title: string
     servings: number
@@ -89,10 +96,13 @@ type MealScheduleState = {
 const MEALS_TO_PREPARE = [MealTime.Lunch, MealTime.Dinner]
 const MealScheduleContext = createContext<MealScheduleContext>({})
 
+//Functions inside the provider are to be used exclusively internally. 
+//They must be passed a Draft version of the state which it can then modify/get the current state of the page from
+//The functions _CAN NOT_ access the state directly or modify the state using the set provided by useImmer
 export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
     const [mealScheduler, setMealScheduler] = useImmer<MealScheduleState>({
         scheduledMeals: initializeWeek(),
-        unscheduledMeals: []
+        unscheduledMeals: [],
     })
 
     function initializeWeek(): ScheduledDay[] {
@@ -109,23 +119,25 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         })
     }
 
-    /*
-    function canAllocateMeal(id: string) {
-        const meal = unscheduledMeals.find((storedMeal) => storedMeal.id === id)
+    function canAllocateMeal(id: string, draft: MealScheduleState) {
+        const meal = draft.unscheduledMeals.find(
+            (storedMeal) => storedMeal.id === id
+        )
         if (!meal) throw new Error(`Meal with id '${id}' does not exist`)
 
-        return meal.servings > 0
+        return meal.servingsLeft > 0
     }
 
-    function reconcileServingsLeft(mealDays: ScheduledDay[]){
+    function reconcileServingsLeft(draft: Draft<MealScheduleState>) {
         //Meal UUID to amount of servings used
-        const amountUsedMap = getMealTiles(mealDays).reduce(
+        const amountUsedMap = getMealTiles(draft).reduce(
             (acc, curr) => {
                 if (curr.type === TileType.FILLED) {
+                    
                     if (curr.id in acc) {
                         acc[curr.id]++
                     } else {
-                        acc[curr.id] = 0
+                        acc[curr.id] = 1
                     }
                 }
                 return acc
@@ -133,31 +145,27 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
             {} as { [key: string]: number }
         )
 
-        setunscheduledMeals((oldunscheduledMeals) => {
-            oldunscheduledMeals.forEach((mealToSchedule) => {
-                const amountUsed = amountUsedMap[mealToSchedule.id] ?? 0
-                mealToSchedule.servingsLeft =
-                    mealToSchedule.servings - amountUsed
-            })
+        draft.unscheduledMeals.forEach((unscheduledMeal) => {
+            const amountUsed = amountUsedMap[unscheduledMeal.id] ?? 0
+            unscheduledMeal.servingsLeft = unscheduledMeal.servings - amountUsed
         })
     }
 
-    function getMealTiles(mealDays: ScheduledDay[]): IndividualMeal[] {
-        return mealDays.reduce((acc, curr) => {
+    function getMealTiles(
+        draft: Draft<MealScheduleState>
+    ): Draft<IndividualMeal>[] {
+        return draft.scheduledMeals.reduce((acc, curr) => {
             acc.push(...Array.from(curr.mealSlotMap.values()).flat())
             return acc
         }, [] as IndividualMeal[])
     }
-
-    */
 
     const addEmptyRow = useCallback(() => {
         setMealScheduler((oldScheduleState) => {
             oldScheduleState.scheduledMeals.forEach((mealDay) => {
                 Array.from(mealDay.mealSlotMap.keys()).forEach(
                     (mealTimeKey) => {
-                        const mealSet =
-                            mealDay.mealSlotMap.get(mealTimeKey)
+                        const mealSet = mealDay.mealSlotMap.get(mealTimeKey)
                         mealSet?.push({ type: TileType.EMPTY })
                     }
                 )
@@ -182,17 +190,16 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
             day: Day,
             mealTime: MealTime,
             mealIndex: number,
-            mealData: { id: string; title: string; color: TileColor },
+            mealData: { id: string; title: string; color: TileColor }
         ) => {
-            //TODO Only work if servings available
-           
-            /* if (!canAllocateMeal(passMeal , mealData.id))
-                throw new Error(`Cannot allocate meal '${mealData.id}'`) */
 
             setMealScheduler((draft) => {
+                if (!canAllocateMeal(mealData.id, draft))
+                    throw new Error(`Cannot allocate meal '${mealData.id}'`)
 
-                
-                const foundDay = draft.scheduledMeals.find((mealDay) => mealDay.day === day)
+                const foundDay = draft.scheduledMeals.find(
+                    (mealDay) => mealDay.day === day
+                )
                 if (!foundDay)
                     throw new Error(`Could not find meal with day ${day}`)
 
@@ -202,19 +209,47 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
                         `Could not find with day ${day} and time ${mealTime}`
                     )
 
+                //Update IndividualMeal
                 mealSetArr[mealIndex] = {
                     ...mealData,
                     type: TileType.FILLED,
                 }
-
-                //TODO After meal is dropped, calculate serving amounts left for every meal
-                //reconcileServingsLeft(draft)
+                //Then reconcile serving amounts
+                reconcileServingsLeft(draft)
             })
         },
         []
     )
 
-    function removeMealFromDay() {}
+    const removeMealFromDay = useCallback((
+        day: Day,
+        mealTime: MealTime,
+        mealIndex: number,
+    ) => {
+        setMealScheduler(draft => {
+            const foundDay = draft.scheduledMeals.find(
+                (mealDay) => mealDay.day === day
+            )
+            if (!foundDay)
+                throw new Error(`Could not find meal with day ${day}`)
+
+            const mealSetArr = foundDay.mealSlotMap.get(mealTime)
+            if (!mealSetArr)
+                throw new Error(
+                    `Could not find with day ${day} and time ${mealTime}`
+                )
+            //Update IndividualMeal
+            mealSetArr[mealIndex] = {type: TileType.EMPTY}
+            //Then reconcile serving amounts
+            reconcileServingsLeft(draft)
+        })
+    },[])
+
+    const canDrag = useCallback((id: string) => {
+        return canAllocateMeal(id, mealScheduler)
+    }, [])
+    
+    //Hardcode Empty Rows for Kyle & Gianna
 
     const value: MealScheduleContext = {
         scheduledMeals: mealScheduler.scheduledMeals,
@@ -222,6 +257,8 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         addEmptyRow,
         createMeal,
         addMealToDay,
+        removeMealFromDay,
+        canDrag
     }
 
     return (
