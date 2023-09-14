@@ -1,6 +1,13 @@
 import { ReactNode, createContext, useCallback, useContext } from 'react'
-import { FilledMealTile, MealTileData, TileColor, TileType } from '../tile'
+import {
+    EmptyMealTile,
+    FilledMealTile,
+    IndividualMeal,
+    TileColor,
+    TileType,
+} from '../tile'
 import { useImmer } from 'use-immer'
+import { v4 as uuid } from 'uuid'
 
 type MealScheduleProviderProps = {
     children: ReactNode
@@ -8,10 +15,16 @@ type MealScheduleProviderProps = {
 
 type MealScheduleContext =
     | {
-          scheduledMeals: MealDay[]
-          mealsToSchedule: MealToSchedule[]
+          scheduledMeals: ScheduledDay[]
+          unscheduledMeals: UnscheduledMeal[]
           addEmptyRow: () => void
-          createMeal: (title: string, servingsLeft: number) => void
+          createMeal: (title: string, servings: number) => void
+          addMealToDay: (
+              day: Day,
+              mealTime: MealTime,
+              mealIndex: number,
+              mealData: { id: string; title: string; color: TileColor },
+          ) => void
       }
     | {}
 export enum Day {
@@ -30,22 +43,15 @@ export enum MealTime {
     Dinner = 'Dinner',
 }
 
-type MealDay = {
+type ScheduledDay = {
     day: Day
-    mealColumnMap: Map<MealTime, MealTileData[]>
+    mealSlotMap: Map<MealTime, IndividualMeal[]>
 }
 
-const MealDays: MealDay[] = [
-    {
-        day: Day.Sunday,
-        mealColumnMap: new Map<MealTime, MealTileData[]>([
-            [MealTime.Breakfast, [{ type: TileType.EMPTY }]],
-        ]),
-    },
-]
-
-type MealToSchedule = {
+type UnscheduledMeal = {
+    id: string
     title: string
+    servings: number
     servingsLeft: number
     color: TileColor
 }
@@ -75,18 +81,25 @@ const makeMealTile = () => {
     }
 }
 
+type MealScheduleState = {
+    scheduledMeals: ScheduledDay[]
+    unscheduledMeals: UnscheduledMeal[]
+}
+
 const MEALS_TO_PREPARE = [MealTime.Lunch, MealTime.Dinner]
 const MealScheduleContext = createContext<MealScheduleContext>({})
 
 export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
-    const [scheduledMeals, setScheduledMeals] = useImmer(initializeWeek())
-    const [mealsToSchedule, setMealsToSchedule] = useImmer<MealToSchedule[]>([])
+    const [mealScheduler, setMealScheduler] = useImmer<MealScheduleState>({
+        scheduledMeals: initializeWeek(),
+        unscheduledMeals: []
+    })
 
-    function initializeWeek(): MealDay[] {
+    function initializeWeek(): ScheduledDay[] {
         return Object.values(Day).map((dayOfWeek) => {
-            const mealDay: MealDay = {
+            const mealDay: ScheduledDay = {
                 day: dayOfWeek,
-                mealColumnMap: new Map<MealTime, MealTileData[]>(
+                mealSlotMap: new Map<MealTime, IndividualMeal[]>(
                     MEALS_TO_PREPARE.map((mealTime) => {
                         return [mealTime, []]
                     })
@@ -96,48 +109,119 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         })
     }
 
+    /*
+    function canAllocateMeal(id: string) {
+        const meal = unscheduledMeals.find((storedMeal) => storedMeal.id === id)
+        if (!meal) throw new Error(`Meal with id '${id}' does not exist`)
+
+        return meal.servings > 0
+    }
+
+    function reconcileServingsLeft(mealDays: ScheduledDay[]){
+        //Meal UUID to amount of servings used
+        const amountUsedMap = getMealTiles(mealDays).reduce(
+            (acc, curr) => {
+                if (curr.type === TileType.FILLED) {
+                    if (curr.id in acc) {
+                        acc[curr.id]++
+                    } else {
+                        acc[curr.id] = 0
+                    }
+                }
+                return acc
+            },
+            {} as { [key: string]: number }
+        )
+
+        setunscheduledMeals((oldunscheduledMeals) => {
+            oldunscheduledMeals.forEach((mealToSchedule) => {
+                const amountUsed = amountUsedMap[mealToSchedule.id] ?? 0
+                mealToSchedule.servingsLeft =
+                    mealToSchedule.servings - amountUsed
+            })
+        })
+    }
+
+    function getMealTiles(mealDays: ScheduledDay[]): IndividualMeal[] {
+        return mealDays.reduce((acc, curr) => {
+            acc.push(...Array.from(curr.mealSlotMap.values()).flat())
+            return acc
+        }, [] as IndividualMeal[])
+    }
+
+    */
+
     const addEmptyRow = useCallback(() => {
-        setScheduledMeals((oldScheduleState) => {
-            oldScheduleState.forEach((mealDay) => {
-                Array.from(mealDay.mealColumnMap.keys()).forEach(
+        setMealScheduler((oldScheduleState) => {
+            oldScheduleState.scheduledMeals.forEach((mealDay) => {
+                Array.from(mealDay.mealSlotMap.keys()).forEach(
                     (mealTimeKey) => {
-                        const setOfMeals =
-                            mealDay.mealColumnMap.get(mealTimeKey)
-                        setOfMeals?.push({ type: TileType.EMPTY })
+                        const mealSet =
+                            mealDay.mealSlotMap.get(mealTimeKey)
+                        mealSet?.push({ type: TileType.EMPTY })
                     }
                 )
             })
         })
     }, [])
 
-    //TODO Consider adding a UUID to meals to schedule to make keeping track of items easier 
-    const createMeal = useCallback((title: string, servingsLeft: number) => {
-        setMealsToSchedule((oldMealsToSchedule) => {
-            oldMealsToSchedule.push({
+    const createMeal = useCallback((title: string, servings: number) => {
+        setMealScheduler((oldScheduleState) => {
+            oldScheduleState.unscheduledMeals.push({
+                id: uuid(),
                 title,
-                servingsLeft,
+                servings,
+                servingsLeft: servings,
                 color: colors[getRandomInt(colors.length)],
             })
         })
     }, [])
 
-    const addMealToDay = useCallback((
-        day: Day,
-        mealTime: MealTime,
-        mealIndex: number,
-        mealData: { title: string; color: TileColor }
-    ) => {
-//TODO Implement
+    const addMealToDay = useCallback(
+        (
+            day: Day,
+            mealTime: MealTime,
+            mealIndex: number,
+            mealData: { id: string; title: string; color: TileColor },
+        ) => {
+            //TODO Only work if servings available
+           
+            /* if (!canAllocateMeal(passMeal , mealData.id))
+                throw new Error(`Cannot allocate meal '${mealData.id}'`) */
 
-    }, []) 
+            setMealScheduler((draft) => {
+
+                
+                const foundDay = draft.scheduledMeals.find((mealDay) => mealDay.day === day)
+                if (!foundDay)
+                    throw new Error(`Could not find meal with day ${day}`)
+
+                const mealSetArr = foundDay.mealSlotMap.get(mealTime)
+                if (!mealSetArr)
+                    throw new Error(
+                        `Could not find with day ${day} and time ${mealTime}`
+                    )
+
+                mealSetArr[mealIndex] = {
+                    ...mealData,
+                    type: TileType.FILLED,
+                }
+
+                //TODO After meal is dropped, calculate serving amounts left for every meal
+                //reconcileServingsLeft(draft)
+            })
+        },
+        []
+    )
 
     function removeMealFromDay() {}
 
-    const value = {
-        scheduledMeals,
-        mealsToSchedule,
+    const value: MealScheduleContext = {
+        scheduledMeals: mealScheduler.scheduledMeals,
+        unscheduledMeals: mealScheduler.unscheduledMeals,
         addEmptyRow,
-        createMeal
+        createMeal,
+        addMealToDay,
     }
 
     return (

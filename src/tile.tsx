@@ -1,10 +1,11 @@
-export type MealTileData = EmptyMealTile | FilledMealTile
+export type IndividualMeal = EmptyMealTile | FilledMealTile
 
 export type EmptyMealTile = {
     type: TileType.EMPTY
 }
 export type FilledMealTile = {
     type: TileType.FILLED
+    id: string
     title: string
     color: TileColor
 }
@@ -24,7 +25,7 @@ export enum TileColor {
     ROSE = 'ROSE',
 }
 
-export default function Tile(props: MealTileData) {
+export default function Tile(props: IndividualMeal) {
     function tileColor(color: TileColor) {
         switch (color) {
             case TileColor.ORANGE:

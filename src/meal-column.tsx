@@ -1,10 +1,10 @@
-import Tile, { MealTileData } from './tile'
+import Tile, { IndividualMeal } from './tile'
 import { Day, MealTime } from './context/MealSchedule'
 
 type MealColumnProps = {
     day: Day
     mealTime: MealTime
-    tiles: MealTileData[]
+    tiles: IndividualMeal[]
 }
 
 export default function MealColumn({ day,mealTime, tiles }: MealColumnProps) {

@@ -35,8 +35,8 @@ function MealsContent({ setSidebarView }: SidebarContent) {
                 Meals
             </div>
             <div className="mx-8 border-t border-solid border-gray-300" />
-            {mealScheduler.mealsToSchedule.map((mealToSchedule) => {
-                return <SidebarTile {...mealToSchedule} />
+            {mealScheduler.unscheduledMeals.map((mealToSchedule) => {
+                return <SidebarTile {...mealToSchedule} key={mealToSchedule.id} />
             })}
             <button
                 className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
@@ -52,7 +52,7 @@ function MealsContent({ setSidebarView }: SidebarContent) {
 
 type CreateMealFormProps = {
     title: string
-    servingsLeft: number
+    servings: number
 }
 
 function CreateMealContent({ setSidebarView }: SidebarContent) {
@@ -74,16 +74,14 @@ function CreateMealContent({ setSidebarView }: SidebarContent) {
                 <input
                     className="w-16 rounded-md border border-solid border-gray-300 p-2 text-red-900 outline-none"
                     type="number"
-                    {...register('servingsLeft', {required: true})}
+                    {...register('servings', {required: true})}
                 />
             </div>
 
             <button
                 className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
                 onClick={handleSubmit((data) => {
-                    console.log(mealScheduler.mealsToSchedule)
-                    mealScheduler.createMeal(data.title, data.servingsLeft)
-                    console.log(mealScheduler.mealsToSchedule)
+                    mealScheduler.createMeal(data.title, data.servings)
                     setSidebarView(SidebarState.MEALS)
                 })}
             >
