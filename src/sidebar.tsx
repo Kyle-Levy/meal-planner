@@ -3,6 +3,7 @@ import DraggableSidebarTile from './draggable-sidebar-tile'
 import { TileColor } from './tile'
 import { useForm } from 'react-hook-form'
 import { useMealSchedule } from './context/MealSchedule'
+import { CustomDragLayer } from './custom-drag-layer'
 
 enum SidebarState {
     MEALS = 'MEALS',
@@ -38,6 +39,7 @@ function MealsContent({ setSidebarView }: SidebarContent) {
             {mealScheduler.unscheduledMeals.map((mealToSchedule) => {
                 return <DraggableSidebarTile {...mealToSchedule} key={mealToSchedule.id} />
             })}
+            <CustomDragLayer />
             <button
                 className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
                 onClick={() => {

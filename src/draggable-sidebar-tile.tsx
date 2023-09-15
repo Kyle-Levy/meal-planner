@@ -1,26 +1,38 @@
-import { useDrag } from 'react-dnd'
+import { DragPreviewImage, useDrag, useDragLayer } from 'react-dnd'
 import SidebarTile, { SidebarTileProps } from './sidebar-tile'
-import { TileColor, TileType } from './tile'
+import Tile, { TileColor, TileType } from './tile'
 import { UnscheduledMeal, useMealSchedule } from './context/MealSchedule'
+import { useEffect } from 'react'
+import { getEmptyImage } from 'react-dnd-html5-backend'
 
 export default function DraggableSidebarTile(props: UnscheduledMeal) {
     const mealScheduler = useMealSchedule()
-    const [, dragRef] = useDrag<UnscheduledMeal>(
+    const [{ isDragging }, dragRef, dragPrev] = useDrag(
         () => ({
             type: TileType.FILLED,
             item: { ...props },
             canDrag: () => {
-                console.log(`${props.servingsLeft} | ${mealScheduler.unscheduledMeals.find(meal => meal.id === props.id)?.servingsLeft}`)
-                console.log(props.servingsLeft > 0)
                 return props.servingsLeft > 0
-            }
+            },
+            collect: (monitor) => ({
+                isDragging: !!monitor.isDragging(),
+            }),
         }),
         [props]
     )
 
+    useEffect(() => {
+        dragPrev(getEmptyImage(), {captureDraggingState: true})
+    }, [])
+
     return (
-        <div ref={dragRef} className='cursor-pointer'>
-            <SidebarTile {...props} />
-        </div>
+        
+
+            <div ref={dragRef} className="cursor-pointer">
+                
+                <SidebarTile {...props} />
+            </div>
+            
     )
 }
+
