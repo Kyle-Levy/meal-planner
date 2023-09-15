@@ -248,8 +248,6 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
     const canDrag = useCallback((id: string) => {
         return canAllocateMeal(id, mealScheduler)
     }, [])
-    
-    //Hardcode Empty Rows for Kyle & Gianna
 
     const value: MealScheduleContext = {
         scheduledMeals: mealScheduler.scheduledMeals,
