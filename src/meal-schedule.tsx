@@ -20,11 +20,13 @@ export default function MealSchedule() {
                 </button>
 
                 <div className="flex gap-2">
-                    {/* <div className="mt-auto flex flex-col gap-2">
-                        <span className="flex h-24 items-center justify-center rounded-md bg-red-900 px-2 text-base text-brown-50">
-                            K
-                        </span>
-                    </div> */}
+                    <div className="mt-auto flex flex-col gap-2">
+                        {mealScheduler.profiles.map((profile) => (
+                            <span className="flex h-24 items-center justify-center rounded-md bg-red-900 px-2 text-base text-brown-50">
+                                {profile[0]}
+                            </span>
+                        ))}
+                    </div>
                     {mealScheduler.scheduledMeals.map((mealDay) => {
                         return (
                             <MealDay mealTime={mealDay.day} key={mealDay.day}>

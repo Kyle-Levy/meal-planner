@@ -16,34 +16,36 @@ export enum TileType {
 }
 
 export enum TileColor {
+    ROSE = 'ROSE',
     ORANGE = 'ORANGE',
     YELLOW = 'YELLOW',
     EMERALD = 'EMERALD',
     SKY = 'SKY',
     INDIGO = 'INDIGO',
     PURPLE = 'PURPLE',
-    ROSE = 'ROSE',
+}
+
+export function tileColor(color: TileColor) {
+    switch (color) {
+        case TileColor.ORANGE:
+            return 'bg-orange-500'
+        case TileColor.YELLOW:
+            return 'bg-yellow-500'
+        case TileColor.EMERALD:
+            return 'bg-emerald-500'
+        case TileColor.SKY:
+            return 'bg-sky-500'
+        case TileColor.INDIGO:
+            return 'bg-indigo-500'
+        case TileColor.PURPLE:
+            return 'bg-purple-500'
+        case TileColor.ROSE:
+            return 'bg-rose-500'
+    }
 }
 
 export default function Tile(props: IndividualMeal) {
-    function tileColor(color: TileColor) {
-        switch (color) {
-            case TileColor.ORANGE:
-                return 'bg-orange-500'
-            case TileColor.YELLOW:
-                return 'bg-yellow-500'
-            case TileColor.EMERALD:
-                return 'bg-emerald-500'
-            case TileColor.SKY:
-                return 'bg-sky-500'
-            case TileColor.INDIGO:
-                return 'bg-indigo-500'
-            case TileColor.PURPLE:
-                return 'bg-purple-500'
-            case TileColor.ROSE:
-                return 'bg-rose-500'
-        }
-    }
+    
 
     if (props.type === TileType.FILLED) {
         const { title, color } = props

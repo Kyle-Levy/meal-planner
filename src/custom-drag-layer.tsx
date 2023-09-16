@@ -38,9 +38,6 @@ export const CustomDragLayer = () => {
         //Center mouse on dragged tile component
         x += initialOffset.x - 96 / 2
 
-        //console.log(`Manual diff ${currentOffset.x - initialOffset.x},${currentOffset.y - initialOffset.y} `)
-        //console.log(`Auto diff ${diff?.x},${diff?.y} `)
-
         const transform = `translate(${x}px, ${y}px)`
         return {
             transform,

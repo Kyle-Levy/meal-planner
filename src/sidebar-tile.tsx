@@ -1,4 +1,4 @@
-import { TileColor } from './tile'
+import { TileColor, tileColor } from './tile'
 
 export type SidebarTileProps = {
     title: string
@@ -16,24 +16,7 @@ export default function SidebarTile({
     color,
     servingsLeft,
 }: SidebarTileProps) {
-    function tileColor(color: TileColor) {
-        switch (color) {
-            case TileColor.ORANGE:
-                return 'bg-orange-500'
-            case TileColor.YELLOW:
-                return 'bg-yellow-500'
-            case TileColor.EMERALD:
-                return 'bg-emerald-500'
-            case TileColor.SKY:
-                return 'bg-sky-500'
-            case TileColor.INDIGO:
-                return 'bg-indigo-500'
-            case TileColor.PURPLE:
-                return 'bg-purple-500'
-            case TileColor.ROSE:
-                return 'bg-rose-500'
-        }
-    }
+    
 
     return (
         <div

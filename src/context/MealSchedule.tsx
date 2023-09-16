@@ -18,8 +18,9 @@ type MealScheduleContext =
     | {
           scheduledMeals: ScheduledDay[]
           unscheduledMeals: UnscheduledMeal[]
+          profiles: string[]
           addEmptyRow: () => void
-          createMeal: (title: string, servings: number) => void
+          createMeal: (title: string, servings: number, color: TileColor) => void
           addMealToDay: (
               day: Day,
               mealTime: MealTime,
@@ -83,11 +84,13 @@ const colors = Object.values(TileColor)
 type MealScheduleState = {
     scheduledMeals: ScheduledDay[]
     unscheduledMeals: UnscheduledMeal[]
+    profiles: string[]
 }
 
 type SerializedMealScheduleState = {
     scheduledMeals: SerializedScheduledDay[]
     unscheduledMeals: UnscheduledMeal[]
+    profiles: string[]
 }
 
 const MEALS_TO_PREPARE = [MealTime.Lunch, MealTime.Dinner]
@@ -111,6 +114,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
     const startingState = savedData ?? {
         scheduledMeals: initializeWeek(),
         unscheduledMeals: [],
+        profiles: ['Kyle', 'Gianna']
     }
 
     const [mealScheduler, setMealScheduler] =
@@ -189,6 +193,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         return {
             scheduledMeals: deserializedMealScheduleState,
             unscheduledMeals: serializedMealScheduleState.unscheduledMeals,
+            profiles: serializedMealScheduleState.profiles
         }
     }
 
@@ -213,6 +218,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         const serializedMealScheduleState: SerializedMealScheduleState = {
             scheduledMeals: serializedScheduledDays,
             unscheduledMeals: draft.unscheduledMeals,
+            profiles: draft.profiles
         }
         window.localStorage.setItem(
             'saved-data',
@@ -234,14 +240,14 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
     }, [])
 
     //TODO Add ability to choose color
-    const createMeal = useCallback((title: string, servings: number) => {
+    const createMeal = useCallback((title: string, servings: number, color: TileColor) => {
         setMealScheduler((oldScheduleState) => {
             oldScheduleState.unscheduledMeals.push({
                 id: uuid(),
                 title,
                 servings,
                 servingsLeft: servings,
-                color: colors[getRandomInt(colors.length)],
+                color,
             })
             saveToStorage(oldScheduleState)
         })
@@ -391,6 +397,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
     const value: MealScheduleContext = {
         scheduledMeals: mealScheduler.scheduledMeals,
         unscheduledMeals: mealScheduler.unscheduledMeals,
+        profiles: mealScheduler.profiles,
         addEmptyRow,
         createMeal,
         addMealToDay,

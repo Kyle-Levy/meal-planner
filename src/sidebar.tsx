@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import DraggableSidebarTile from './draggable-sidebar-tile'
 import { TileColor } from './tile'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useMealSchedule } from './context/MealSchedule'
 import { CustomDragLayer } from './custom-drag-layer'
+import SelectableColor from './SelectableColor'
+import ColorSelect from './ColorSelect'
 
 enum SidebarState {
     MEALS = 'MEALS',
@@ -38,13 +40,13 @@ function MealsContent({ setSidebarView }: SidebarContent) {
             <div className="mx-8 border-t border-solid border-gray-300" />
             {mealScheduler.unscheduledMeals.map((mealToSchedule) => {
                 return (
-                    <div className="flex gap-2 w-full items-center">
+                    <div className="flex w-full items-center gap-2">
                         <DraggableSidebarTile
                             {...mealToSchedule}
                             key={mealToSchedule.id}
                         />
                         <span
-                            className="text-lg text-gray-300 cursor-pointer"
+                            className="cursor-pointer text-lg text-gray-300"
                             onClick={() => {
                                 mealScheduler.removeUnscheduledMeal(
                                     mealToSchedule.id
@@ -69,13 +71,14 @@ function MealsContent({ setSidebarView }: SidebarContent) {
     )
 }
 
-type CreateMealFormProps = {
+export type CreateMealFormProps = {
     title: string
     servings: number
+    color: TileColor
 }
 
 function CreateMealContent({ setSidebarView }: SidebarContent) {
-    const { handleSubmit, register } = useForm<CreateMealFormProps>()
+    const { handleSubmit, register, control } = useForm<CreateMealFormProps>()
     const mealScheduler = useMealSchedule()
 
     return (
@@ -96,11 +99,15 @@ function CreateMealContent({ setSidebarView }: SidebarContent) {
                     {...register('servings', { required: true })}
                 />
             </div>
+            <div className="flex flex-col gap-2">
+                <label className="text-lg text-red-900">Color</label>
+                <ColorSelect control={control}/>
+            </div>
 
             <button
                 className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
                 onClick={handleSubmit((data) => {
-                    mealScheduler.createMeal(data.title, data.servings)
+                    mealScheduler.createMeal(data.title, data.servings, data.color)
                     setSidebarView(SidebarState.MEALS)
                 })}
             >
