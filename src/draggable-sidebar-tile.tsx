@@ -28,7 +28,7 @@ export default function DraggableSidebarTile(props: UnscheduledMeal) {
     return (
         
 
-            <div ref={dragRef} className="cursor-pointer">
+            <div ref={dragRef} className="cursor-pointer grow">
                 
                 <SidebarTile {...props} />
             </div>

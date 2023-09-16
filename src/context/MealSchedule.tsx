@@ -31,7 +31,7 @@ type MealScheduleContext =
               mealTime: MealTime,
               mealIndex: number
           ) => void
-          canDrag: (id: string) => boolean
+          removeUnscheduledMeal: (idToRemove: string) => void
       }
     | {}
 export enum Day {
@@ -301,9 +301,32 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         []
     )
 
-    const canDrag = useCallback((id: string) => {
-        return canAllocateMeal(id, mealScheduler)
-    }, [])
+    const removeUnscheduledMeal = useCallback( (idToRemove: string) => {
+        setMealScheduler((draft) => {
+            //Remove from schedule
+            draft.scheduledMeals.forEach(mealDay => {
+                const iter = mealDay.mealSlotMap.values()
+                let result = iter.next()
+                while (!result.done){
+                    const mealTiles = result.value
+                    for(let i = 0; i < mealTiles.length; i++){
+                        const currentTile = mealTiles[i]
+                        if(currentTile.type === TileType.FILLED && currentTile.id === idToRemove){
+                            mealTiles[i] = {type: TileType.EMPTY} //Removing if ID matches
+                        }
+                    }
+                    result = iter.next()
+                }
+
+            })
+
+            //Remove as meal option
+            draft.unscheduledMeals = draft.unscheduledMeals.filter(meal => meal.id !== idToRemove)
+            
+            //Save new state
+            saveToStorage(draft)
+        })
+    },[])
 
     const value: MealScheduleContext = {
         scheduledMeals: mealScheduler.scheduledMeals,
@@ -312,7 +335,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         createMeal,
         addMealToDay,
         removeMealFromDay,
-        canDrag,
+        removeUnscheduledMeal,
     }
 
     return (

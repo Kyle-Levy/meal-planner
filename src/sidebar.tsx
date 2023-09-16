@@ -37,7 +37,24 @@ function MealsContent({ setSidebarView }: SidebarContent) {
             </div>
             <div className="mx-8 border-t border-solid border-gray-300" />
             {mealScheduler.unscheduledMeals.map((mealToSchedule) => {
-                return <DraggableSidebarTile {...mealToSchedule} key={mealToSchedule.id} />
+                return (
+                    <div className="flex gap-2 w-full items-center">
+                        <DraggableSidebarTile
+                            {...mealToSchedule}
+                            key={mealToSchedule.id}
+                        />
+                        <span
+                            className="text-lg text-gray-300 cursor-pointer"
+                            onClick={() => {
+                                mealScheduler.removeUnscheduledMeal(
+                                    mealToSchedule.id
+                                )
+                            }}
+                        >
+                            X
+                        </span>
+                    </div>
+                )
             })}
             <CustomDragLayer />
             <button
@@ -67,7 +84,7 @@ function CreateMealContent({ setSidebarView }: SidebarContent) {
                 <label className="text-lg text-red-900">Meal</label>
                 <input
                     className="rounded-md border border-solid border-gray-300 p-2 text-red-900 outline-none"
-                    {...register('title', {required: true})}
+                    {...register('title', { required: true })}
                 />
             </div>
 
@@ -76,7 +93,7 @@ function CreateMealContent({ setSidebarView }: SidebarContent) {
                 <input
                     className="w-16 rounded-md border border-solid border-gray-300 p-2 text-red-900 outline-none"
                     type="number"
-                    {...register('servings', {required: true})}
+                    {...register('servings', { required: true })}
                 />
             </div>
 
