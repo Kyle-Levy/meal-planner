@@ -16,8 +16,6 @@ export default function SidebarTile({
     color,
     servingsLeft,
 }: SidebarTileProps) {
-    
-
     return (
         <div
             className={`w-full ${tileColor(color)} ${

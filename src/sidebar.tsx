@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import DraggableSidebarTile from './draggable-sidebar-tile'
-import { TileColor } from './tile'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
+import ColorSelect from './ColorSelect'
 import { useMealSchedule } from './context/MealSchedule'
 import { CustomDragLayer } from './custom-drag-layer'
-import SelectableColor from './SelectableColor'
-import ColorSelect from './ColorSelect'
+import DraggableSidebarTile from './draggable-sidebar-tile'
+import { TileColor } from './tile'
 
 enum SidebarState {
     MEALS = 'MEALS',
@@ -101,13 +100,17 @@ function CreateMealContent({ setSidebarView }: SidebarContent) {
             </div>
             <div className="flex flex-col gap-2">
                 <label className="text-lg text-red-900">Color</label>
-                <ColorSelect control={control}/>
+                <ColorSelect control={control} />
             </div>
 
             <button
                 className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
                 onClick={handleSubmit((data) => {
-                    mealScheduler.createMeal(data.title, data.servings, data.color)
+                    mealScheduler.createMeal(
+                        data.title,
+                        data.servings,
+                        data.color
+                    )
                     setSidebarView(SidebarState.MEALS)
                 })}
             >

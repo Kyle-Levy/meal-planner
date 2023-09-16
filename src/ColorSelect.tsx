@@ -1,7 +1,7 @@
-import { Controller, Control } from 'react-hook-form'
-import { TileColor } from './tile'
+import { Control, Controller } from 'react-hook-form'
 import SelectableColor from './SelectableColor'
 import { CreateMealFormProps } from './sidebar'
+import { TileColor } from './tile'
 
 type ColorSelectProps = {
     control: Control<CreateMealFormProps, any>

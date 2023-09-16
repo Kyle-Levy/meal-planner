@@ -1,9 +1,9 @@
-import { DragPreviewImage, useDrag, useDragLayer } from 'react-dnd'
-import SidebarTile, { SidebarTileProps } from './sidebar-tile'
-import Tile, { TileColor, TileType } from './tile'
-import { UnscheduledMeal, useMealSchedule } from './context/MealSchedule'
 import { useEffect } from 'react'
+import { useDrag } from 'react-dnd'
 import { getEmptyImage } from 'react-dnd-html5-backend'
+import { UnscheduledMeal, useMealSchedule } from './context/MealSchedule'
+import SidebarTile from './sidebar-tile'
+import { TileType } from './tile'
 
 export default function DraggableSidebarTile(props: UnscheduledMeal) {
     const mealScheduler = useMealSchedule()
@@ -22,17 +22,12 @@ export default function DraggableSidebarTile(props: UnscheduledMeal) {
     )
 
     useEffect(() => {
-        dragPrev(getEmptyImage(), {captureDraggingState: true})
+        dragPrev(getEmptyImage(), { captureDraggingState: true })
     }, [])
 
     return (
-        
-
-            <div ref={dragRef} className="cursor-pointer grow">
-                
-                <SidebarTile {...props} />
-            </div>
-            
+        <div ref={dragRef} className="grow cursor-pointer">
+            <SidebarTile {...props} />
+        </div>
     )
 }
-

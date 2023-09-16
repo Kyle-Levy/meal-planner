@@ -1,11 +1,11 @@
 import { useDrop } from 'react-dnd'
-import Tile, { IndividualMeal, TileType } from './tile'
 import {
     Day,
     MealTime,
-    useMealSchedule,
     UnscheduledMeal,
+    useMealSchedule,
 } from './context/MealSchedule'
+import Tile, { IndividualMeal, TileType } from './tile'
 
 type DroppableTileProps = {
     mealLocation: {
@@ -43,7 +43,9 @@ export default function DroppableTile({
                     mealLocation.index
                 )
             }}
-            className={tileDetails.type === TileType.FILLED ? 'cursor-pointer' : ''}
+            className={
+                tileDetails.type === TileType.FILLED ? 'cursor-pointer' : ''
+            }
         >
             <Tile {...tileDetails} />
         </div>

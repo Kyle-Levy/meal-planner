@@ -45,8 +45,6 @@ export function tileColor(color: TileColor) {
 }
 
 export default function Tile(props: IndividualMeal) {
-    
-
     if (props.type === TileType.FILLED) {
         const { title, color } = props
         return (

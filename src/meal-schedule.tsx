@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Day, MealTime, useMealSchedule } from './context/MealSchedule'
+import { useMealSchedule } from './context/MealSchedule'
 import MealColumn from './meal-column'
 import MealDay from './meal-day'
 import Sidebar from './sidebar'
