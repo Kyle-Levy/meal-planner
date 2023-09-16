@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useCallback, useContext } from 'react'
-import {
+import Tile, {
     EmptyMealTile,
     FilledMealTile,
     IndividualMeal,
@@ -32,6 +32,11 @@ type MealScheduleContext =
               mealIndex: number
           ) => void
           removeUnscheduledMeal: (idToRemove: string) => void
+          addMealToTimeSlot: (
+              day: Day,
+              mealTime: MealTime,
+              mealId: string
+          ) => void
       }
     | {}
 export enum Day {
@@ -228,6 +233,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         })
     }, [])
 
+    //TODO Add ability to choose color
     const createMeal = useCallback((title: string, servings: number) => {
         setMealScheduler((oldScheduleState) => {
             oldScheduleState.unscheduledMeals.push({
@@ -301,32 +307,86 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         []
     )
 
-    const removeUnscheduledMeal = useCallback( (idToRemove: string) => {
+    const removeUnscheduledMeal = useCallback((idToRemove: string) => {
         setMealScheduler((draft) => {
             //Remove from schedule
-            draft.scheduledMeals.forEach(mealDay => {
+            draft.scheduledMeals.forEach((mealDay) => {
                 const iter = mealDay.mealSlotMap.values()
                 let result = iter.next()
-                while (!result.done){
+                while (!result.done) {
                     const mealTiles = result.value
-                    for(let i = 0; i < mealTiles.length; i++){
+                    for (let i = 0; i < mealTiles.length; i++) {
                         const currentTile = mealTiles[i]
-                        if(currentTile.type === TileType.FILLED && currentTile.id === idToRemove){
-                            mealTiles[i] = {type: TileType.EMPTY} //Removing if ID matches
+                        if (
+                            currentTile.type === TileType.FILLED &&
+                            currentTile.id === idToRemove
+                        ) {
+                            mealTiles[i] = { type: TileType.EMPTY } //Removing if ID matches
                         }
                     }
                     result = iter.next()
                 }
-
             })
 
             //Remove as meal option
-            draft.unscheduledMeals = draft.unscheduledMeals.filter(meal => meal.id !== idToRemove)
-            
+            draft.unscheduledMeals = draft.unscheduledMeals.filter(
+                (meal) => meal.id !== idToRemove
+            )
+
             //Save new state
             saveToStorage(draft)
         })
-    },[])
+    }, [])
+
+    const addMealToTimeSlot = useCallback(
+        (day: Day, mealTime: MealTime, mealId: string) => {
+            setMealScheduler((draft) => {
+                const mealToAdd = draft.unscheduledMeals.find(
+                    (meal) => meal.id === mealId
+                )
+                if (!mealToAdd)
+                    throw new Error('Cannot find meal to add to timeslot')
+
+                const foundDay = draft.scheduledMeals.find(
+                    (mealDay) => mealDay.day === day
+                )
+                if (!foundDay)
+                    throw new Error(`Could not find meal with day ${day}`)
+
+                const mealSetArr = foundDay.mealSlotMap.get(mealTime)
+                if (!mealSetArr)
+                    throw new Error(
+                        `Could not find with day ${day} and time ${mealTime}`
+                    )
+
+                let numberToAdd =
+                    mealToAdd.servingsLeft < mealSetArr.length
+                        ? mealToAdd.servingsLeft
+                        : mealSetArr.length
+                let index = 0
+                while (index < mealSetArr.length && numberToAdd > 0) {
+                    const currentMeal = mealSetArr[index]
+                    if (
+                        currentMeal.type === TileType.EMPTY ||
+                        currentMeal.id !== mealId
+                    ) {
+                        mealSetArr[index] = {
+                            ...mealToAdd,
+                            type: TileType.FILLED,
+                        }
+                        numberToAdd--
+                    }
+                    index++
+                }
+
+                reconcileServingsLeft(draft)
+                saveToStorage(draft)
+            })
+        },
+        []
+    )
+
+    //TODO Add callback to add profiles to the page state
 
     const value: MealScheduleContext = {
         scheduledMeals: mealScheduler.scheduledMeals,
@@ -336,6 +396,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         addMealToDay,
         removeMealFromDay,
         removeUnscheduledMeal,
+        addMealToTimeSlot,
     }
 
     return (
