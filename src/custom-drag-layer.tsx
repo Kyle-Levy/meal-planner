@@ -1,4 +1,4 @@
-import type { CSSProperties, FC } from 'react'
+import type { CSSProperties } from 'react'
 import type { XYCoord } from 'react-dnd'
 import { useDragLayer } from 'react-dnd'
 import Tile, { TileType } from './tile'
@@ -23,16 +23,9 @@ export const CustomDragLayer = () => {
             isDragging: monitor.isDragging(),
         }))
 
-         function snapToGrid(x: number, y: number): [number, number] {
-            const snappedX = Math.round(x / 32) * 32
-            const snappedY = Math.round(y / 32) * 32
-            return [snappedX, snappedY]
-          }
-
     function getItemStyles(
         initialOffset: XYCoord | null,
-        currentOffset: XYCoord | null,
-        
+        currentOffset: XYCoord | null
     ) {
         if (!initialOffset || !currentOffset) {
             return {
@@ -40,13 +33,10 @@ export const CustomDragLayer = () => {
             }
         }
 
-        
-
         let { x, y } = currentOffset
 
-        //Center mouse on dragged tile component  
-        x += initialOffset.x - (96/2)
-        y += initialOffset.y - 96
+        //Center mouse on dragged tile component
+        x += initialOffset.x - 96 / 2
 
         //console.log(`Manual diff ${currentOffset.x - initialOffset.x},${currentOffset.y - initialOffset.y} `)
         //console.log(`Auto diff ${diff?.x},${diff?.y} `)
