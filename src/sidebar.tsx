@@ -1,4 +1,8 @@
-import { useState } from 'react'
+import {
+    UserGroupIcon,
+    ClockIcon,
+    RectangleStackIcon,
+} from '@heroicons/react/24/outline'
 import { useForm } from 'react-hook-form'
 import ColorSelect from './ColorSelect'
 import { useMealSchedule } from './context/MealSchedule'
@@ -6,20 +10,66 @@ import { CustomDragLayer } from './custom-drag-layer'
 import DraggableSidebarTile from './draggable-sidebar-tile'
 import { TileColor } from './tile'
 
-enum SidebarState {
+export enum SidebarState {
     MEALS = 'MEALS',
     CREATE_MEAL = 'CREATE_MEAL',
+    PROFILES = 'PROFILES',
+    CREATE_PROFILE = 'CREATE_PROFILE',
+    CLOSED = 'CLOSED',
 }
-export default function Sidebar({}) {
-    const [currentView, setCurrentView] = useState(SidebarState.MEALS)
+
+type SidebarProps = {
+    sidebarState: SidebarState
+    setSidebarState: (state: SidebarState) => void
+}
+
+export default function Sidebar({
+    sidebarState,
+    setSidebarState,
+}: SidebarProps) {
     return (
-        <div className="fixed flex h-screen w-96 flex-col gap-2 bg-white p-4">
-            {currentView === SidebarState.MEALS && (
-                <MealsContent setSidebarView={setCurrentView} />
+        <div className="fixed flex h-screen">
+            <div className="flex w-16 flex-col items-center gap-8  bg-white pt-4">
+                <div className="flex items-center justify-center rounded-md p-1 hover:bg-brown-50">
+                    <UserGroupIcon
+                        className="h-8 w-8 cursor-pointer text-brown-900"
+                        onClick={() => {
+                            if (sidebarState === SidebarState.PROFILES) {
+                                setSidebarState(SidebarState.CLOSED)
+                            } else {
+                                setSidebarState(SidebarState.PROFILES)
+                            }
+                        }}
+                    />
+                </div>
+                <div className="flex items-center justify-center rounded-md p-1 hover:bg-brown-50">
+                    <RectangleStackIcon
+                        className="h-8 w-8 cursor-pointer  text-brown-900"
+                        onClick={() => {
+                            if (sidebarState === SidebarState.MEALS) {
+                                setSidebarState(SidebarState.CLOSED)
+                            } else {
+                                setSidebarState(SidebarState.MEALS)
+                            }
+                        }}
+                    />
+                </div>
+                <div className="flex items-center justify-center rounded-md p-1 hover:bg-brown-50">
+                    <ClockIcon className="h-8 w-8 cursor-not-allowed  text-brown-900" />
+                </div>
+            </div>
+
+            {sidebarState !== SidebarState.CLOSED && (
+                <div className="flex w-96 flex-col gap-2 bg-white p-4 border-l border-gray-300">
+                {sidebarState === SidebarState.MEALS && (
+                    <MealsContent setSidebarView={setSidebarState} />
+                )}
+                {sidebarState === SidebarState.CREATE_MEAL && (
+                    <CreateMealContent setSidebarView={setSidebarState} />
+                )}
+            </div>
             )}
-            {currentView === SidebarState.CREATE_MEAL && (
-                <CreateMealContent setSidebarView={setCurrentView} />
-            )}
+            
         </div>
     )
 }

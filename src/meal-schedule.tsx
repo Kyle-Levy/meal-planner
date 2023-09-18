@@ -1,15 +1,16 @@
+import { useState } from 'react'
 import { useMealSchedule } from './context/MealSchedule'
 import MealColumn from './meal-column'
 import MealDay from './meal-day'
-import Sidebar from './sidebar'
+import Sidebar, { SidebarState } from './sidebar'
 
 export default function MealSchedule() {
     const mealScheduler = useMealSchedule()
-
+    const [sidebarState, setSidebarState] = useState(SidebarState.MEALS)
     return (
         <div className="flex h-screen w-screen gap-4">
-            <Sidebar />
-            <div className="ml-96 flex h-full w-full items-center justify-center bg-brown-50 px-4">
+            <Sidebar sidebarState={sidebarState} setSidebarState={setSidebarState} />
+            <div className={` ${sidebarState === SidebarState.CLOSED ? 'ml-16' : 'ml-[28rem]'} flex h-full w-full items-center justify-center bg-brown-50 px-4`}>
                 <button
                     onClick={() => {
                         mealScheduler.addEmptyRow()
