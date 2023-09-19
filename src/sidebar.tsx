@@ -2,6 +2,7 @@ import {
     UserGroupIcon,
     ClockIcon,
     RectangleStackIcon,
+    PlusIcon,
 } from '@heroicons/react/24/outline'
 import { useForm } from 'react-hook-form'
 import ColorSelect from './ColorSelect'
@@ -9,6 +10,7 @@ import { useMealSchedule } from './context/MealSchedule'
 import { CustomDragLayer } from './custom-drag-layer'
 import DraggableSidebarTile from './draggable-sidebar-tile'
 import { TileColor } from './tile'
+import ProfileTile from './ProfileTile'
 
 export enum SidebarState {
     MEALS = 'MEALS',
@@ -60,16 +62,23 @@ export default function Sidebar({
             </div>
 
             {sidebarState !== SidebarState.CLOSED && (
-                <div className="flex w-96 flex-col gap-2 bg-white p-4 border-l border-gray-300">
-                {sidebarState === SidebarState.MEALS && (
-                    <MealsContent setSidebarView={setSidebarState} />
-                )}
-                {sidebarState === SidebarState.CREATE_MEAL && (
-                    <CreateMealContent setSidebarView={setSidebarState} />
-                )}
-            </div>
+                <div className="flex w-96 flex-col gap-2 border-l border-gray-300 bg-white p-4">
+                    {sidebarState === SidebarState.MEALS && (
+                        <MealsContent setSidebarView={setSidebarState} />
+                    )}
+                    {sidebarState === SidebarState.CREATE_MEAL && (
+                        <CreateMealContent setSidebarView={setSidebarState} />
+                    )}
+                    {sidebarState === SidebarState.PROFILES && (
+                        <ProfilesContent setSidebarView={setSidebarState} />
+                    )}
+                    {sidebarState === SidebarState.CREATE_PROFILE && (
+                        <CreateProfileContent
+                            setSidebarView={setSidebarState}
+                        />
+                    )}
+                </div>
             )}
-            
         </div>
     )
 }
@@ -165,6 +174,61 @@ function CreateMealContent({ setSidebarView }: SidebarContent) {
                 })}
             >
                 Create Meal
+            </button>
+        </>
+    )
+}
+
+function ProfilesContent({ setSidebarView }: SidebarContent) {
+    const mealScheduler = useMealSchedule()
+    return (
+        <>
+            <div className="flex items-center justify-between text-xl text-brown-900">
+                <span>Profiles</span>
+                <PlusIcon
+                    className="h-6 w-6 cursor-pointer text-brown-900"
+                    onClick={() => setSidebarView(SidebarState.CREATE_PROFILE)}
+                />
+            </div>
+            {mealScheduler.profiles.map((profile) => (
+                <ProfileTile
+                    name={profile.name}
+                    key={profile.id}
+                    onClick={() => mealScheduler.removeProfile(profile.id)}
+                />
+            ))}
+        </>
+    )
+}
+
+type CreateProfileProps = {
+    name: string
+}
+function CreateProfileContent({ setSidebarView }: SidebarContent) {
+    const { handleSubmit, register } = useForm<CreateProfileProps>()
+    const mealScheduler = useMealSchedule()
+
+    return (
+        <>
+            <div className="flex items-center text-xl text-brown-900">
+                <span>New Profile</span>
+            </div>
+            <div className="flex flex-col gap-2">
+                <label className="text-lg text-brown-900">Name</label>
+                <input
+                    className="rounded-md border border-solid border-gray-300 p-2 text-brown-900 outline-none"
+                    {...register('name', { required: true })}
+                />
+            </div>
+
+            <button
+                className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
+                onClick={handleSubmit((data) => {
+                    mealScheduler.addProfile(data.name)
+                    setSidebarView(SidebarState.PROFILES)
+                })}
+            >
+                Add Profile
             </button>
         </>
     )

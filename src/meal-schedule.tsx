@@ -11,19 +11,12 @@ export default function MealSchedule() {
         <div className="flex h-screen w-screen gap-4">
             <Sidebar sidebarState={sidebarState} setSidebarState={setSidebarState} />
             <div className={` ${sidebarState === SidebarState.CLOSED ? 'ml-16' : 'ml-[28rem]'} flex h-full w-full items-center justify-center bg-brown-50 px-4`}>
-                <button
-                    onClick={() => {
-                        mealScheduler.addEmptyRow()
-                    }}
-                >
-                    Add Empty Row of Data
-                </button>
 
                 <div className="flex gap-2">
                     <div className="mt-auto flex flex-col gap-2">
                         {mealScheduler.profiles.map((profile) => (
                             <span className="flex h-24 items-center justify-center rounded-md bg-red-900 px-2 text-base text-brown-50">
-                                {profile[0]}
+                                {profile.name[0]}
                             </span>
                         ))}
                     </div>

@@ -18,9 +18,14 @@ type MealScheduleContext =
     | {
           scheduledMeals: ScheduledDay[]
           unscheduledMeals: UnscheduledMeal[]
-          profiles: string[]
-          addEmptyRow: () => void
-          createMeal: (title: string, servings: number, color: TileColor) => void
+          profiles: Profile[]
+          addProfile: (name: string) => void
+          removeProfile: (id: string) => void
+          createMeal: (
+              title: string,
+              servings: number,
+              color: TileColor
+          ) => void
           addMealToDay: (
               day: Day,
               mealTime: MealTime,
@@ -40,6 +45,12 @@ type MealScheduleContext =
           ) => void
       }
     | {}
+
+type Profile = {
+    id: string
+    name: string
+}
+
 export enum Day {
     Sunday = 'Sunday',
     Monday = 'Monday',
@@ -74,23 +85,16 @@ export type UnscheduledMeal = {
     color: TileColor
 }
 
-//Used to give a created meal a random color
-function getRandomInt(max: number) {
-    return Math.floor(Math.random() * max)
-}
-
-const colors = Object.values(TileColor)
-
 type MealScheduleState = {
     scheduledMeals: ScheduledDay[]
     unscheduledMeals: UnscheduledMeal[]
-    profiles: string[]
+    profiles: Profile[]
 }
 
 type SerializedMealScheduleState = {
     scheduledMeals: SerializedScheduledDay[]
     unscheduledMeals: UnscheduledMeal[]
-    profiles: string[]
+    profiles: Profile[]
 }
 
 const MEALS_TO_PREPARE = [MealTime.Lunch, MealTime.Dinner]
@@ -114,7 +118,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
     const startingState = savedData ?? {
         scheduledMeals: initializeWeek(),
         unscheduledMeals: [],
-        profiles: ['Kyle', 'Gianna']
+        profiles: [],
     }
 
     const [mealScheduler, setMealScheduler] =
@@ -193,7 +197,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         return {
             scheduledMeals: deserializedMealScheduleState,
             unscheduledMeals: serializedMealScheduleState.unscheduledMeals,
-            profiles: serializedMealScheduleState.profiles
+            profiles: serializedMealScheduleState.profiles,
         }
     }
 
@@ -218,7 +222,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         const serializedMealScheduleState: SerializedMealScheduleState = {
             scheduledMeals: serializedScheduledDays,
             unscheduledMeals: draft.unscheduledMeals,
-            profiles: draft.profiles
+            profiles: draft.profiles,
         }
         window.localStorage.setItem(
             'saved-data',
@@ -226,32 +230,30 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         )
     }
 
-    const addEmptyRow = useCallback(() => {
-        setMealScheduler((oldScheduleState) => {
-            oldScheduleState.scheduledMeals.forEach((mealDay) => {
-                Array.from(mealDay.mealSlotMap.keys()).forEach(
-                    (mealTimeKey) => {
-                        const mealSet = mealDay.mealSlotMap.get(mealTimeKey)
-                        mealSet?.push({ type: TileType.EMPTY })
-                    }
-                )
+    function addEmptyRow(draft: Draft<MealScheduleState>) {
+        draft.scheduledMeals.forEach((mealDay) => {
+            Array.from(mealDay.mealSlotMap.keys()).forEach((mealTimeKey) => {
+                const mealSet = mealDay.mealSlotMap.get(mealTimeKey)
+                mealSet?.push({ type: TileType.EMPTY })
             })
         })
-    }, [])
+    }
 
-    //TODO Add ability to choose color
-    const createMeal = useCallback((title: string, servings: number, color: TileColor) => {
-        setMealScheduler((oldScheduleState) => {
-            oldScheduleState.unscheduledMeals.push({
-                id: uuid(),
-                title,
-                servings,
-                servingsLeft: servings,
-                color,
+    const createMeal = useCallback(
+        (title: string, servings: number, color: TileColor) => {
+            setMealScheduler((oldScheduleState) => {
+                oldScheduleState.unscheduledMeals.push({
+                    id: uuid(),
+                    title,
+                    servings,
+                    servingsLeft: servings,
+                    color,
+                })
+                saveToStorage(oldScheduleState)
             })
-            saveToStorage(oldScheduleState)
-        })
-    }, [])
+        },
+        []
+    )
 
     const addMealToDay = useCallback(
         (
@@ -392,18 +394,45 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         []
     )
 
+    const addProfile = useCallback((name: string) => {
+        setMealScheduler((draft) => {
+            draft.profiles.push({ id: uuid(), name })
+            addEmptyRow(draft)
+            saveToStorage(draft)
+        })
+    }, [])
+
+    const removeProfile = useCallback((id: string) => {
+        setMealScheduler(draft => {
+            const profileIndex = draft.profiles.findIndex(profile => profile.id === id)
+            if(profileIndex === -1) throw new Error('Profile to remove not found')
+            draft.profiles = draft.profiles.filter(profile => profile.id !== id)
+
+            draft.scheduledMeals.forEach(mealDay => {
+                Array.from(mealDay.mealSlotMap.values()).forEach((mealSet) => {
+                    mealSet = mealSet.splice(profileIndex, 1)
+                })
+            })
+
+            reconcileServingsLeft(draft)
+            saveToStorage(draft)
+
+        })
+    }, [])
+
     //TODO Add callback to add profiles to the page state
 
     const value: MealScheduleContext = {
         scheduledMeals: mealScheduler.scheduledMeals,
         unscheduledMeals: mealScheduler.unscheduledMeals,
         profiles: mealScheduler.profiles,
-        addEmptyRow,
         createMeal,
         addMealToDay,
         removeMealFromDay,
         removeUnscheduledMeal,
         addMealToTimeSlot,
+        addProfile,
+        removeProfile
     }
 
     return (
