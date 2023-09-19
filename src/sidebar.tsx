@@ -1,16 +1,17 @@
 import {
-    UserGroupIcon,
     ClockIcon,
-    RectangleStackIcon,
     PlusIcon,
+    RectangleStackIcon,
+    UserGroupIcon,
+    XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { useForm } from 'react-hook-form'
 import ColorSelect from './ColorSelect'
+import ProfileTile from './ProfileTile'
 import { useMealSchedule } from './context/MealSchedule'
 import { CustomDragLayer } from './custom-drag-layer'
 import DraggableSidebarTile from './draggable-sidebar-tile'
 import { TileColor } from './tile'
-import ProfileTile from './ProfileTile'
 
 export enum SidebarState {
     MEALS = 'MEALS',
@@ -92,10 +93,14 @@ function MealsContent({ setSidebarView }: SidebarContent) {
 
     return (
         <>
-            <div className="flex items-center justify-center text-lg text-red-900">
-                Meals
+            <div className="flex items-center justify-between text-xl text-brown-900">
+                <span>Meals</span>
+                <PlusIcon
+                    className="h-6 w-6 cursor-pointer text-brown-900"
+                    onClick={() => setSidebarView(SidebarState.CREATE_MEAL)}
+                />
             </div>
-            <div className="mx-8 border-t border-solid border-gray-300" />
+
             {mealScheduler.unscheduledMeals.map((mealToSchedule) => {
                 return (
                     <div className="flex w-full items-center gap-2">
@@ -103,28 +108,18 @@ function MealsContent({ setSidebarView }: SidebarContent) {
                             {...mealToSchedule}
                             key={mealToSchedule.id}
                         />
-                        <span
-                            className="cursor-pointer text-lg text-gray-300"
+                        <XMarkIcon
+                            className="cursor-pointer w-6 h-6 text-gray-400"
                             onClick={() => {
                                 mealScheduler.removeUnscheduledMeal(
                                     mealToSchedule.id
                                 )
                             }}
-                        >
-                            X
-                        </span>
+                        />
                     </div>
                 )
             })}
             <CustomDragLayer />
-            <button
-                className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
-                onClick={() => {
-                    setSidebarView(SidebarState.CREATE_MEAL)
-                }}
-            >
-                Create Meal
-            </button>
         </>
     )
 }
