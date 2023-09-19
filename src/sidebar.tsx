@@ -137,23 +137,23 @@ function CreateMealContent({ setSidebarView }: SidebarContent) {
     return (
         <>
             <div className="flex flex-col gap-2">
-                <label className="text-lg text-red-900">Meal</label>
+                <label className="text-lg text-brown-900">Meal</label>
                 <input
-                    className="rounded-md border border-solid border-gray-300 p-2 text-red-900 outline-none"
+                    className="rounded-md border border-solid border-gray-300 p-2 text-brown-900 outline-none"
                     {...register('title', { required: true })}
                 />
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-lg text-red-900">Servings</label>
+                <label className="text-lg text-brown-900">Servings</label>
                 <input
-                    className="w-16 rounded-md border border-solid border-gray-300 p-2 text-red-900 outline-none"
+                    className="w-16 rounded-md border border-solid border-gray-300 p-2 text-brown-900 outline-none"
                     type="number"
                     {...register('servings', { required: true })}
                 />
             </div>
             <div className="flex flex-col gap-2">
-                <label className="text-lg text-red-900">Color</label>
+                <label className="text-lg text-brown-900">Color</label>
                 <ColorSelect control={control} />
             </div>
 
