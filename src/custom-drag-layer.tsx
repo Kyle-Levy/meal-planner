@@ -36,7 +36,7 @@ export const CustomDragLayer = () => {
         let { x, y } = currentOffset
 
         //Center mouse on dragged tile component
-        x += initialOffset.x - 96 / 2
+        x += initialOffset.x - 96
 
         const transform = `translate(${x}px, ${y}px)`
         return {
