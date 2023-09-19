@@ -6,7 +6,7 @@ import Sidebar, { SidebarState } from './sidebar'
 
 export default function MealSchedule() {
     const mealScheduler = useMealSchedule()
-    const [sidebarState, setSidebarState] = useState(SidebarState.MEALS)
+    const [sidebarState, setSidebarState] = useState(SidebarState.CLOSED)
     return (
         <div className="flex h-screen w-screen gap-4">
             <Sidebar sidebarState={sidebarState} setSidebarState={setSidebarState} />
