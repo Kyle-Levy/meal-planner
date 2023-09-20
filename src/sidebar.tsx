@@ -4,6 +4,7 @@ import {
     RectangleStackIcon,
     UserGroupIcon,
     XMarkIcon,
+    PencilSquareIcon
 } from '@heroicons/react/24/outline'
 import { useForm } from 'react-hook-form'
 import ColorSelect from './ColorSelect'
@@ -12,10 +13,12 @@ import { useMealSchedule } from './context/MealSchedule'
 import { CustomDragLayer } from './custom-drag-layer'
 import DraggableSidebarTile from './draggable-sidebar-tile'
 import { TileColor } from './tile'
+import { useState } from 'react'
 
 export enum SidebarState {
     MEALS = 'MEALS',
     CREATE_MEAL = 'CREATE_MEAL',
+    EDIT_MEAL = 'EDIT_MEAL',
     PROFILES = 'PROFILES',
     CREATE_PROFILE = 'CREATE_PROFILE',
     CLOSED = 'CLOSED',
@@ -30,6 +33,7 @@ export default function Sidebar({
     sidebarState,
     setSidebarState,
 }: SidebarProps) {
+    const [editMealId, setEditMealId] = useState('')
     return (
         <div className="fixed flex h-screen">
             <div className="flex w-16 flex-col items-center gap-8  bg-white pt-4">
@@ -65,10 +69,17 @@ export default function Sidebar({
             {sidebarState !== SidebarState.CLOSED && (
                 <div className="flex w-96 flex-col gap-2 border-l border-gray-300 bg-white p-4">
                     {sidebarState === SidebarState.MEALS && (
-                        <MealsContent setSidebarView={setSidebarState} />
+                        <MealsContent setEditMealId={setEditMealId} setSidebarView={setSidebarState} />
                     )}
                     {sidebarState === SidebarState.CREATE_MEAL && (
                         <CreateMealContent setSidebarView={setSidebarState} />
+                    )}
+
+                    {sidebarState === SidebarState.EDIT_MEAL && (
+                        <EditMealContent
+                            id={editMealId}
+                            setSidebarView={setSidebarState}
+                        />
                     )}
                     {sidebarState === SidebarState.PROFILES && (
                         <ProfilesContent setSidebarView={setSidebarState} />
@@ -88,7 +99,12 @@ type SidebarContent = {
     setSidebarView: (newState: SidebarState) => void
 }
 
-function MealsContent({ setSidebarView }: SidebarContent) {
+type MealsContentProps = {
+    setSidebarView: (newState: SidebarState) => void
+    setEditMealId: (id: string) => void
+}
+
+function MealsContent({ setEditMealId, setSidebarView }: MealsContentProps) {
     const mealScheduler = useMealSchedule()
 
     return (
@@ -107,6 +123,13 @@ function MealsContent({ setSidebarView }: SidebarContent) {
                         <DraggableSidebarTile
                             {...mealToSchedule}
                             key={mealToSchedule.id}
+                        />
+                        <PencilSquareIcon
+                            className="h-6 w-6 cursor-pointer text-gray-400"
+                            onClick={() => {
+                                setEditMealId(mealToSchedule.id)
+                                setSidebarView(SidebarState.EDIT_MEAL)
+                            }}
                         />
                         <XMarkIcon
                             className="h-6 w-6 cursor-pointer text-gray-400"
@@ -169,6 +192,67 @@ function CreateMealContent({ setSidebarView }: SidebarContent) {
                 })}
             >
                 Create Meal
+            </button>
+        </>
+    )
+}
+
+type EditMealProps = {
+    setSidebarView: (newState: SidebarState) => void
+    id: string
+}
+
+function EditMealContent({ id, setSidebarView }: EditMealProps) {
+    const mealScheduler = useMealSchedule()
+
+    const meal = mealScheduler.unscheduledMeals.find(
+        (unscheduledMeal) => unscheduledMeal.id === id
+    )
+    if (!meal) throw new Error('Cannot edit meal that does not exist')
+    const { handleSubmit, register, control } = useForm<CreateMealFormProps>({
+        defaultValues: {
+            title: meal.title,
+            servings: meal.servings,
+            color: meal.color,
+        },
+    })
+
+
+
+    return (
+        <>
+            <div className="flex flex-col gap-2">
+                <label className="text-lg text-brown-900">Meal</label>
+                <input
+                    className="rounded-md border border-solid border-gray-300 p-2 text-brown-900 outline-none"
+                    {...register('title', { required: true })}
+                />
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <label className="text-lg text-brown-900">Servings</label>
+                <input
+                    className="w-16 rounded-md border border-solid border-gray-300 p-2 text-brown-900 outline-none"
+                    type="number"
+                    {...register('servings', { required: true, min: meal.servings-meal.servingsLeft})}
+                />
+            </div>
+            <div className="flex flex-col gap-2">
+                <label className="text-lg text-brown-900">Color</label>
+                <ColorSelect control={control} />
+            </div>
+
+            <button
+                className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
+                onClick={handleSubmit((data) => {
+                    mealScheduler.editMeal(
+                        id,
+                        {...data}
+                    )
+                    setSidebarView(SidebarState.MEALS)
+                })}
+            >
+                Edit Meal
             </button>
         </>
     )

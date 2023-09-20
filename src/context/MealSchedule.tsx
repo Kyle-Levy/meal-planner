@@ -26,6 +26,7 @@ type MealScheduleContext =
               servings: number,
               color: TileColor
           ) => void
+          editMeal: (id: string, mealData: {title: string, servings: number, color: TileColor}) => void
           addMealToDay: (
               day: Day,
               mealTime: MealTime,
@@ -420,6 +421,29 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         })
     }, [])
 
+    const editMeal = useCallback((id: string, mealData: {title: string, servings: number, color: TileColor}) => {
+        setMealScheduler(draft => {
+            const editedMealTiles = getMealTiles(draft).filter(tile => tile.type === TileType.FILLED && tile.id === id) as FilledMealTile[]
+            editedMealTiles.forEach(tile => {
+                tile.title = mealData.title
+                tile.color = mealData.color
+            })
+            const mealIndex = draft.unscheduledMeals.findIndex(unscheduledMeal => unscheduledMeal.id === id)
+
+            
+            draft.unscheduledMeals[mealIndex] = {
+                id,
+                title: mealData.title,
+                servings: mealData.servings,
+                servingsLeft: mealData.servings - editedMealTiles.length,
+                color: mealData.color
+            }
+
+            reconcileServingsLeft(draft)
+            saveToStorage(draft)
+        })
+    }, [])
+
     //TODO Add callback to add profiles to the page state
 
     const value: MealScheduleContext = {
@@ -428,6 +452,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         profiles: mealScheduler.profiles,
         createMeal,
         addMealToDay,
+        editMeal,
         removeMealFromDay,
         removeUnscheduledMeal,
         addMealToTimeSlot,
