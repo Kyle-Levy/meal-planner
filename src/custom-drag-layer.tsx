@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import type { XYCoord } from 'react-dnd'
 import { useDragLayer } from 'react-dnd'
 import Tile, { TileType } from './tile'
+import { DraggableTypes } from './types'
 
 const layerStyles: CSSProperties = {
     position: 'fixed',
@@ -47,12 +48,12 @@ export const CustomDragLayer = () => {
 
     function renderItem() {
         switch (itemType) {
-            case TileType.FILLED:
+            case DraggableTypes.UnscheduledMeal:
                 return (
                     <Tile
                         title={item.title}
                         color={item.color}
-                        type={itemType}
+                        type={TileType.FILLED}
                         id={item.id}
                     />
                 )
