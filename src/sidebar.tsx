@@ -33,32 +33,32 @@ export default function Sidebar({
     return (
         <div className="fixed flex h-screen">
             <div className="flex w-16 flex-col items-center gap-8  bg-white pt-4">
-                <div className="flex items-center justify-center rounded-md p-1 hover:bg-brown-50">
-                    <UserGroupIcon
-                        className="h-8 w-8 cursor-pointer text-brown-900"
-                        onClick={() => {
-                            if (sidebarState === SidebarState.PROFILES) {
-                                setSidebarState(SidebarState.CLOSED)
-                            } else {
-                                setSidebarState(SidebarState.PROFILES)
-                            }
-                        }}
-                    />
+                <div
+                    className="flex cursor-pointer items-center justify-center rounded-md p-1 hover:bg-brown-50"
+                    onClick={() => {
+                        if (sidebarState === SidebarState.PROFILES) {
+                            setSidebarState(SidebarState.CLOSED)
+                        } else {
+                            setSidebarState(SidebarState.PROFILES)
+                        }
+                    }}
+                >
+                    <UserGroupIcon className="h-8 w-8 text-brown-900" />
                 </div>
-                <div className="flex items-center justify-center rounded-md p-1 hover:bg-brown-50">
-                    <RectangleStackIcon
-                        className="h-8 w-8 cursor-pointer  text-brown-900"
-                        onClick={() => {
-                            if (sidebarState === SidebarState.MEALS) {
-                                setSidebarState(SidebarState.CLOSED)
-                            } else {
-                                setSidebarState(SidebarState.MEALS)
-                            }
-                        }}
-                    />
+                <div
+                    className="flex cursor-pointer items-center justify-center rounded-md p-1 hover:bg-brown-50"
+                    onClick={() => {
+                        if (sidebarState === SidebarState.MEALS) {
+                            setSidebarState(SidebarState.CLOSED)
+                        } else {
+                            setSidebarState(SidebarState.MEALS)
+                        }
+                    }}
+                >
+                    <RectangleStackIcon className="h-8 w-8   text-brown-900" />
                 </div>
-                <div className="flex items-center justify-center rounded-md p-1 hover:bg-brown-50">
-                    <ClockIcon className="h-8 w-8 cursor-not-allowed  text-brown-900" />
+                <div className="flex cursor-not-allowed items-center justify-center rounded-md p-1 hover:bg-brown-50">
+                    <ClockIcon className="h-8 w-8   text-brown-900" />
                 </div>
             </div>
 
@@ -109,7 +109,7 @@ function MealsContent({ setSidebarView }: SidebarContent) {
                             key={mealToSchedule.id}
                         />
                         <XMarkIcon
-                            className="cursor-pointer w-6 h-6 text-gray-400"
+                            className="h-6 w-6 cursor-pointer text-gray-400"
                             onClick={() => {
                                 mealScheduler.removeUnscheduledMeal(
                                     mealToSchedule.id
