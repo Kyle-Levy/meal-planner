@@ -27,7 +27,7 @@ export default function MealColumn({ day, mealTime, tiles }: MealColumnProps) {
         <div className="flex flex-col gap-2">
             <div
                 ref={dropRef}
-                className="flex items-center justify-center rounded-md bg-red-900 px-4 py-1 text-base text-brown-50"
+                className="flex items-center justify-center rounded-md bg-brown-50 px-4 py-1 text-base text-brown-900"
             >
                 {mealTime}
             </div>

@@ -36,7 +36,7 @@ export default function Sidebar({
     const [editMealId, setEditMealId] = useState('')
     return (
         <div className="fixed flex h-screen">
-            <div className="flex w-16 flex-col items-center gap-8  bg-white pt-4">
+            <div className="flex w-16 flex-col items-center gap-8  bg-brown-50 pt-4 border-r border-brown-300">
                 <div
                     className="flex cursor-pointer items-center justify-center rounded-md p-1 hover:bg-brown-50"
                     onClick={() => {
@@ -67,7 +67,7 @@ export default function Sidebar({
             </div>
 
             {sidebarState !== SidebarState.CLOSED && (
-                <div className="flex w-96 flex-col gap-2 border-l border-gray-300 bg-white p-4">
+                <div className="flex w-96 flex-col gap-2 bg-white p-4">
                     {sidebarState === SidebarState.MEALS && (
                         <MealsContent setEditMealId={setEditMealId} setSidebarView={setSidebarState} />
                     )}
