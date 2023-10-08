@@ -20,27 +20,27 @@ export enum TileColor {
     ORANGE = 'ORANGE',
     YELLOW = 'YELLOW',
     EMERALD = 'EMERALD',
-    SKY = 'SKY',
     INDIGO = 'INDIGO',
+    SKY = 'SKY',
     PURPLE = 'PURPLE',
 }
 
 export function tileColor(color: TileColor) {
     switch (color) {
         case TileColor.ORANGE:
-            return 'bg-orange-500'
+            return 'bg-[#ec7668] text-[#ecd19e]'
         case TileColor.YELLOW:
-            return 'bg-yellow-500'
+            return 'bg-[#e7c456] text-[#8f6049]'
         case TileColor.EMERALD:
-            return 'bg-emerald-500'
+            return 'bg-[#3aa08f] text-[#ded46a]'
         case TileColor.SKY:
-            return 'bg-sky-500'
+            return 'bg-[#304180] text-[#edd4d2]'
         case TileColor.INDIGO:
-            return 'bg-indigo-500'
+            return 'bg-[#656553] text-[#e8ca57]'
         case TileColor.PURPLE:
-            return 'bg-purple-500'
+            return 'bg-[#4a3a7a] text-[#eed7ff]'
         case TileColor.ROSE:
-            return 'bg-rose-500'
+            return 'bg-[#aa4843] text-[#ff836c]'
     }
 }
 
@@ -51,7 +51,7 @@ export default function Tile(props: IndividualMeal) {
             <div
                 className={`h-24 w-24 ${tileColor(
                     color
-                )} flex items-center justify-center rounded-md p-2 text-base text-white`}
+                )} flex items-center justify-center rounded-md p-2 text-base`}
             >
                 {title}
             </div>
