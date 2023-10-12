@@ -7,6 +7,7 @@ import {
 } from './context/MealSchedule'
 import DroppableTile from './droppable-tile'
 import { IndividualMeal, TileType } from './tile'
+import { DraggableTypes } from './types'
 
 type MealColumnProps = {
     day: Day
@@ -18,7 +19,7 @@ export default function MealColumn({ day, mealTime, tiles }: MealColumnProps) {
     const mealScheduler = useMealSchedule()
 
     const [, dropRef] = useDrop<UnscheduledMeal>({
-        accept: TileType.FILLED,
+        accept: DraggableTypes.UnscheduledMeal,
         drop: (item) => {
             mealScheduler.addMealToTimeSlot(day, mealTime, item.id)
         },
