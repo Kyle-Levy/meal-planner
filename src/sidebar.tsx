@@ -10,9 +10,9 @@ import { useForm } from 'react-hook-form'
 import ColorSelect from './ColorSelect'
 import ProfileTile from './ProfileTile'
 import { useMealSchedule } from './context/MealSchedule'
-import { CustomDragLayer } from './custom-drag-layer'
-import DraggableSidebarTile from './draggable-sidebar-tile'
-import { TileColor } from './tile'
+import { CustomDragLayer } from './CustomDragLayer'
+import DraggableSidebarTile from './DraggableSidebarTile'
+import { TileColor } from './Tile'
 import { useState } from 'react'
 
 export enum SidebarState {

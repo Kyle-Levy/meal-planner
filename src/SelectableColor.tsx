@@ -1,4 +1,4 @@
-import { TileColor, tileColor } from './tile'
+import { TileColor, tileColor } from './Tile'
 
 type SelectableColorProps = {
     selected: boolean

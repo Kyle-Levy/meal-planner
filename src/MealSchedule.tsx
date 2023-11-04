@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useMealSchedule } from './context/MealSchedule'
-import MealColumn from './meal-column'
-import MealDay from './meal-day'
-import Sidebar, { SidebarState } from './sidebar'
+import MealColumn from './MealColumn'
+import MealDay from './MealDay'
+import Sidebar, { SidebarState } from './Sidebar'
 
 export default function MealSchedule() {
     const mealScheduler = useMealSchedule()

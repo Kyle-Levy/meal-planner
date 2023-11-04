@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { useDrag } from 'react-dnd'
 import { getEmptyImage } from 'react-dnd-html5-backend'
 import { UnscheduledMeal, useMealSchedule } from './context/MealSchedule'
-import SidebarTile from './sidebar-tile'
-import { TileType } from './tile'
+import SidebarTile from './SidebarTile'
+import { TileType } from './Tile'
 import { DraggableTypes } from './types'
 
 export default function DraggableSidebarTile(props: UnscheduledMeal) {

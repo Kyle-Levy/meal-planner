@@ -1,6 +1,6 @@
 import { useDrag } from 'react-dnd'
 import { Day, MealTime } from './context/MealSchedule'
-import Tile, { FilledMealTile } from './tile'
+import Tile, { FilledMealTile } from './Tile'
 import { DraggableTypes } from './types'
 
 export type DraggableScheduleTileProps = {

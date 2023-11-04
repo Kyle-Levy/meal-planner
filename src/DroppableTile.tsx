@@ -8,7 +8,7 @@ import {
     UnscheduledMeal,
     useMealSchedule,
 } from './context/MealSchedule'
-import Tile, { IndividualMeal, TileType } from './tile'
+import Tile, { IndividualMeal, TileType } from './Tile'
 import { DraggableTypes } from './types'
 
 type DroppableTileProps = {

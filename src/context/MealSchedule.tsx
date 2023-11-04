@@ -5,7 +5,7 @@ import Tile, {
     IndividualMeal,
     TileColor,
     TileType,
-} from '../tile'
+} from '../Tile'
 import { useImmer } from 'use-immer'
 import { v4 as uuid } from 'uuid'
 import { Draft } from 'immer'
