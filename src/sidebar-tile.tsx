@@ -23,7 +23,7 @@ export default function SidebarTile({
             } flex select-none items-center justify-between rounded-md p-2 text-base text-white`}
         >
             <span>{title}</span>
-            <span>{servingsLeft}</span>
+            <span className='text-lg'>{servingsLeft}</span>
         </div>
     )
 }
