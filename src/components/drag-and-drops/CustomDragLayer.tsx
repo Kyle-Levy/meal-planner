@@ -1,8 +1,8 @@
 import type { CSSProperties } from 'react'
 import type { XYCoord } from 'react-dnd'
 import { useDragLayer } from 'react-dnd'
-import Tile, { TileType } from './Tile'
-import { DraggableTypes } from './types'
+import Tile, { TileType } from '../Tile'
+import { DraggableTypes } from '../../types'
 
 const layerStyles: CSSProperties = {
     position: 'fixed',

@@ -2,7 +2,7 @@ import { DndProvider } from 'react-dnd'
 
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { MealScheduleProvider } from './context/MealSchedule'
-import MealSchedule from './MealSchedule'
+import MealSchedule from './components/MealSchedule'
 
 function App() {
     return (

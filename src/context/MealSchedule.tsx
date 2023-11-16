@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useCallback, useContext } from 'react'
-import { FilledMealTile, IndividualMeal, TileColor, TileType } from '../Tile'
+import { FilledMealTile, IndividualMeal, TileColor, TileType } from '../components/Tile'
 import { useImmer } from 'use-immer'
 import { v4 as uuid } from 'uuid'
 import { Draft } from 'immer'

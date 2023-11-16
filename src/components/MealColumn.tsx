@@ -4,10 +4,10 @@ import {
     MealTime,
     UnscheduledMeal,
     useMealSchedule,
-} from './context/MealSchedule'
-import DroppableTile from './DroppableTile'
+} from '../context/MealSchedule'
+import DroppableTile from './drag-and-drops/DroppableTile'
 import { IndividualMeal } from './Tile'
-import { DraggableTypes } from './types'
+import { DraggableTypes } from '../types'
 
 type MealColumnProps = {
     day: Day

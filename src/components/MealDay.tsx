@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Day } from './context/MealSchedule'
+import { Day } from '../context/MealSchedule'
 
 type MealColumnProps = {
     mealTime: Day
