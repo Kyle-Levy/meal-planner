@@ -6,7 +6,7 @@ import {
     useMealSchedule,
 } from './context/MealSchedule'
 import DroppableTile from './DroppableTile'
-import { IndividualMeal, TileType } from './Tile'
+import { IndividualMeal } from './Tile'
 import { DraggableTypes } from './types'
 
 type MealColumnProps = {

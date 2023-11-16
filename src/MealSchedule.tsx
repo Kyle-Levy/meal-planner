@@ -9,9 +9,17 @@ export default function MealSchedule() {
     const [sidebarState, setSidebarState] = useState(SidebarState.CLOSED)
     return (
         <div className="flex h-screen w-screen gap-4">
-            <Sidebar sidebarState={sidebarState} setSidebarState={setSidebarState} />
-            <div className={` ${sidebarState === SidebarState.CLOSED ? 'ml-16' : 'ml-[28rem]'} flex h-full w-full items-center justify-center bg-gray-100 px-4`}>
-
+            <Sidebar
+                sidebarState={sidebarState}
+                setSidebarState={setSidebarState}
+            />
+            <div
+                className={` ${
+                    sidebarState === SidebarState.CLOSED
+                        ? 'ml-16'
+                        : 'ml-[28rem]'
+                } flex h-full w-full items-center justify-center bg-gray-100 px-4`}
+            >
                 <div className="flex gap-2">
                     <div className="mt-auto flex flex-col gap-2">
                         {mealScheduler.profiles.map((profile) => (

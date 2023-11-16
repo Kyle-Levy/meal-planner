@@ -1,27 +1,23 @@
-import { UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import { UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
-export type ProfileTile = {
+type ProfileTileProps = {
     name: string
     onClick: () => void
 }
 
-
-
-export default function ProfileTile({
-    name,
-    onClick
-}: ProfileTile) {
+export default function ProfileTile({ name, onClick }: ProfileTileProps) {
     return (
         <div
-            className={`w-full flex select-none items-center justify-between rounded-md p-2 bg-brown-50 `}
+            className={`flex w-full select-none items-center justify-between rounded-md bg-brown-50 p-2 `}
         >
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
                 <UserCircleIcon className="h-6 w-6 text-brown-900" />
-                <div className="text-brown-900 text-base">
-                    {name}
-                </div>
+                <div className="text-base text-brown-900">{name}</div>
             </div>
-            <XMarkIcon className="h-6 w-6 text-brown-900 cursor-pointer" onClick={onClick}/>
+            <XMarkIcon
+                className="h-6 w-6 cursor-pointer text-brown-900"
+                onClick={onClick}
+            />
         </div>
     )
 }

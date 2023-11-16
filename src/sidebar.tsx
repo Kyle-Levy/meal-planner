@@ -4,7 +4,7 @@ import {
     RectangleStackIcon,
     UserGroupIcon,
     XMarkIcon,
-    PencilSquareIcon
+    PencilSquareIcon,
 } from '@heroicons/react/24/outline'
 import { useForm } from 'react-hook-form'
 import ColorSelect from './ColorSelect'
@@ -36,7 +36,7 @@ export default function Sidebar({
     const [editMealId, setEditMealId] = useState('')
     return (
         <div className="fixed flex h-screen">
-            <div className="flex w-16 flex-col items-center gap-8  bg-brown-50 pt-4 border-r border-brown-300">
+            <div className="flex w-16 flex-col items-center gap-8  border-r border-brown-300 bg-brown-50 pt-4">
                 <div
                     className="flex cursor-pointer items-center justify-center rounded-md p-1 hover:bg-brown-50"
                     onClick={() => {
@@ -69,7 +69,10 @@ export default function Sidebar({
             {sidebarState !== SidebarState.CLOSED && (
                 <div className="flex w-96 flex-col gap-2 bg-white p-4">
                     {sidebarState === SidebarState.MEALS && (
-                        <MealsContent setEditMealId={setEditMealId} setSidebarView={setSidebarState} />
+                        <MealsContent
+                            setEditMealId={setEditMealId}
+                            setSidebarView={setSidebarState}
+                        />
                     )}
                     {sidebarState === SidebarState.CREATE_MEAL && (
                         <CreateMealContent setSidebarView={setSidebarState} />
@@ -217,8 +220,6 @@ function EditMealContent({ id, setSidebarView }: EditMealProps) {
         },
     })
 
-
-
     return (
         <>
             <div className="flex flex-col gap-2">
@@ -234,7 +235,10 @@ function EditMealContent({ id, setSidebarView }: EditMealProps) {
                 <input
                     className="w-16 rounded-md border border-solid border-gray-300 p-2 text-brown-900 outline-none"
                     type="number"
-                    {...register('servings', { required: true, min: meal.servings-meal.servingsLeft})}
+                    {...register('servings', {
+                        required: true,
+                        min: meal.servings - meal.servingsLeft,
+                    })}
                 />
             </div>
             <div className="flex flex-col gap-2">
@@ -245,10 +249,7 @@ function EditMealContent({ id, setSidebarView }: EditMealProps) {
             <button
                 className="mt-auto flex items-center justify-center rounded-md bg-red-900 py-1 text-lg text-brown-50"
                 onClick={handleSubmit((data) => {
-                    mealScheduler.editMeal(
-                        id,
-                        {...data}
-                    )
+                    mealScheduler.editMeal(id, { ...data })
                     setSidebarView(SidebarState.MEALS)
                 })}
             >
