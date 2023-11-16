@@ -20,7 +20,7 @@ export default function SidebarTile({
         <div
             className={`w-full ${tileColor(color)} ${
                 servingsLeft === 0 && 'cursor-not-allowed opacity-50'
-            } flex select-none items-center justify-between rounded-md p-2 text-base text-white`}
+            } flex select-none items-center justify-between rounded-md p-2 text-base`}
         >
             <span>{title}</span>
             <span className="text-lg">{servingsLeft}</span>
