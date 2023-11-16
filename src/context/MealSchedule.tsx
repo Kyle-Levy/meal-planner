@@ -1,11 +1,5 @@
 import { ReactNode, createContext, useCallback, useContext } from 'react'
-import Tile, {
-    EmptyMealTile,
-    FilledMealTile,
-    IndividualMeal,
-    TileColor,
-    TileType,
-} from '../Tile'
+import { FilledMealTile, IndividualMeal, TileColor, TileType } from '../Tile'
 import { useImmer } from 'use-immer'
 import { v4 as uuid } from 'uuid'
 import { Draft } from 'immer'
@@ -14,7 +8,7 @@ type MealScheduleProviderProps = {
     children: ReactNode
 }
 
-type MealScheduleContext =
+type MealScheduleContextProps =
     | {
           scheduledMeals: ScheduledDay[]
           unscheduledMeals: UnscheduledMeal[]
@@ -26,7 +20,10 @@ type MealScheduleContext =
               servings: number,
               color: TileColor
           ) => void
-          editMeal: (id: string, mealData: {title: string, servings: number, color: TileColor}) => void
+          editMeal: (
+              id: string,
+              mealData: { title: string; servings: number; color: TileColor }
+          ) => void
           addMealToDay: (
               day: Day,
               mealTime: MealTime,
@@ -99,7 +96,7 @@ type SerializedMealScheduleState = {
 }
 
 const MEALS_TO_PREPARE = [MealTime.Lunch, MealTime.Dinner]
-const MealScheduleContext = createContext<MealScheduleContext>({})
+const MealScheduleContext = createContext<MealScheduleContextProps>({})
 
 //Functions inside the provider are to be used exclusively internally.
 //They must be passed a Draft version of the state which it can then modify/get the current state of the page from
@@ -404,12 +401,17 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
     }, [])
 
     const removeProfile = useCallback((id: string) => {
-        setMealScheduler(draft => {
-            const profileIndex = draft.profiles.findIndex(profile => profile.id === id)
-            if(profileIndex === -1) throw new Error('Profile to remove not found')
-            draft.profiles = draft.profiles.filter(profile => profile.id !== id)
+        setMealScheduler((draft) => {
+            const profileIndex = draft.profiles.findIndex(
+                (profile) => profile.id === id
+            )
+            if (profileIndex === -1)
+                throw new Error('Profile to remove not found')
+            draft.profiles = draft.profiles.filter(
+                (profile) => profile.id !== id
+            )
 
-            draft.scheduledMeals.forEach(mealDay => {
+            draft.scheduledMeals.forEach((mealDay) => {
                 Array.from(mealDay.mealSlotMap.values()).forEach((mealSet) => {
                     mealSet = mealSet.splice(profileIndex, 1)
                 })
@@ -417,36 +419,44 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
 
             reconcileServingsLeft(draft)
             saveToStorage(draft)
-
         })
     }, [])
 
-    const editMeal = useCallback((id: string, mealData: {title: string, servings: number, color: TileColor}) => {
-        setMealScheduler(draft => {
-            const editedMealTiles = getMealTiles(draft).filter(tile => tile.type === TileType.FILLED && tile.id === id) as FilledMealTile[]
-            editedMealTiles.forEach(tile => {
-                tile.title = mealData.title
-                tile.color = mealData.color
+    const editMeal = useCallback(
+        (
+            id: string,
+            mealData: { title: string; servings: number; color: TileColor }
+        ) => {
+            setMealScheduler((draft) => {
+                const editedMealTiles = getMealTiles(draft).filter(
+                    (tile) => tile.type === TileType.FILLED && tile.id === id
+                ) as FilledMealTile[]
+                editedMealTiles.forEach((tile) => {
+                    tile.title = mealData.title
+                    tile.color = mealData.color
+                })
+                const mealIndex = draft.unscheduledMeals.findIndex(
+                    (unscheduledMeal) => unscheduledMeal.id === id
+                )
+
+                draft.unscheduledMeals[mealIndex] = {
+                    id,
+                    title: mealData.title,
+                    servings: mealData.servings,
+                    servingsLeft: mealData.servings - editedMealTiles.length,
+                    color: mealData.color,
+                }
+
+                reconcileServingsLeft(draft)
+                saveToStorage(draft)
             })
-            const mealIndex = draft.unscheduledMeals.findIndex(unscheduledMeal => unscheduledMeal.id === id)
-
-            
-            draft.unscheduledMeals[mealIndex] = {
-                id,
-                title: mealData.title,
-                servings: mealData.servings,
-                servingsLeft: mealData.servings - editedMealTiles.length,
-                color: mealData.color
-            }
-
-            reconcileServingsLeft(draft)
-            saveToStorage(draft)
-        })
-    }, [])
+        },
+        []
+    )
 
     //TODO Add callback to add profiles to the page state
 
-    const value: MealScheduleContext = {
+    const value: MealScheduleContextProps = {
         scheduledMeals: mealScheduler.scheduledMeals,
         unscheduledMeals: mealScheduler.unscheduledMeals,
         profiles: mealScheduler.profiles,
@@ -457,7 +467,7 @@ export function MealScheduleProvider({ children }: MealScheduleProviderProps) {
         removeUnscheduledMeal,
         addMealToTimeSlot,
         addProfile,
-        removeProfile
+        removeProfile,
     }
 
     return (
